@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+    <button onclick="startVideo()">Start Video</button>
+    <button onclick="stopVideo()">Stop Video</button>
+    <br />
+    <video id="localVideo" autoplay= style="width: 320px; height: 240px;"></video>
+</body>
+<script>
+    let localVideo = document.getElementById('localVideo');
+    let localStream;
+    // Start local video
+    async function startVideo() {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            localVideo.srcObject = localStream;
+        } catch (error) {
+            console.error('Error accessing media devices.', error);
+        }
+    }
+
+    async function stopVideo() {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+</script>
+</html>
