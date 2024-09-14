@@ -1,0 +1,10 @@
+{
+	"name": "simple-signaling-server",
+	"scripts": {
+		"start": "node signaling.js"
+	},
+	"dependencies": {
+		"ws": "^8.18.0"
+	},
+	"packageManager": "pnpm@9.10.0"
+}
