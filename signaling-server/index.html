@@ -58,6 +58,22 @@
       let answer = new RTCSessionDescription(message);
       setAnswer(answer);
     }
+    else if (message.type === 'candidate') {
+      console.info('Received ICE candidate ...');
+      let candidate = new RTCIceCandidate(message.ice);
+      console.info(candidate);
+      addIceCandidate(candidate);
+    }
+  }
+
+  function addIceCandidate(candidate) {
+    if (peerConnection) {
+      peerConnection.addIceCandidate(candidate);
+    }
+    else {
+      console.error('PeerConnection not exist!');
+      return;
+    }
   }
  
   // --- prefix -----
@@ -199,13 +215,14 @@
         console.info(evt.candidate);
  
         // Trickle ICE の場合は、ICE candidateを相手に送る
+        sendIceCandidate(evt.candidate);
         // Vanilla ICE の場合には、何もしない
       } else {
         console.info('empty ice event');
  
         // Trickle ICE の場合は、何もしない
         // Vanilla ICE の場合には、ICE candidateを含んだSDPを相手に送る
-        sendSdp(peer.localDescription);
+        // sendSdp(peer.localDescription);
       }
     };
  
@@ -233,8 +250,9 @@
       console.info('setLocalDescription() succsess in promise');
  
       // -- Trickle ICE の場合は、初期SDPを相手に送る -- 
+      sendSdp(peerConnection.localDescription);
+
       // -- Vanilla ICE の場合には、まだSDPは送らない --
-      //sendSdp(peerConnection.localDescription);
     }).catch(function(err) {
       console.error(err);
     });
@@ -269,8 +287,9 @@
       console.info('setLocalDescription() succsess in promise');
  
       // -- Trickle ICE の場合は、初期SDPを相手に送る -- 
+      sendSdp(peerConnection.localDescription);
+
       // -- Vanilla ICE の場合には、まだSDPは送らない --
-      //sendSdp(peerConnection.localDescription);
     }).catch(function(err) {
       console.error(err);
     });
@@ -312,6 +331,14 @@
     else {
       console.warn('peer NOT exist.');
     }
+  }
+
+  function sendIceCandidate(candidate) {
+    console.info('---sending ICE candidate ---');
+    let obj = { type: 'candidate', ice: candidate };
+    let message = JSON.stringify(obj);
+    console.info('sending candidate=' + message);
+    ws.send(message);
   }
  
 </script>
